@@ -23,7 +23,6 @@ kind: Target
 metadata:
  name: multi-prods
 description: test for multiple prod clusters
-requireApproval: true
 multiTarget:
  targetIds: [ prod-us, prod-aus ]
 ---
