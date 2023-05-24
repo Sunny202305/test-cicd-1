@@ -1,0 +1,53 @@
+steps:
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+    - 'build'
+    - '-t'
+    - 'us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:$COMMIT_SHA'
+    - '-t'
+    - 'us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:latest'
+    - '.'
+# Push container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', 'us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:$COMMIT_SHA' ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', 'us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:latest' ]
+
+# Deploy image to GKE
+# 1.Need to check if the deployment and service existed, if not create them.
+# 2.Double check of permission granted to CloudBuild service account for managing GKE Cluster. 
+#   in our case, grant Kubernetes Engine Admin permission to CloudBuild Service account. 
+# - name: gcr.io/cloud-builders/kubectl
+#   args:
+#     - set
+#     - image
+#     - deployment/test-cicd-1
+#     - test-cicd-1=us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:$COMMIT_SHA
+#   env:
+#     - CLOUDSDK_COMPUTE_ZONE=us-central1
+#     - CLOUDSDK_CONTAINER_CLUSTER=staging
+
+# # Create release in Google Cloud Deploy
+# - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+#   entrypoint: gcloud
+#   args:
+#     [
+#       'deploy', 'releases', 'create', 'rel-${SHORT_SHA}',
+#       '--delivery-pipeline', 'nextjs-cbcd-pipeline',
+#       '--region', 'us-central1',
+#       '--annotations', 'commitId=${REVISION_ID}',
+#       '--images', 'test-cicd-1=us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:${COMMIT_SHA}'
+#     ]
+
+# # Create release in Google Cloud Deploy(Auto Promote from Staging to Production)
+# - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+#   entrypoint: gcloud
+#   args:
+#     [
+#       'deploy', 'releases', 'promote',
+#       '--release', 'rel-${SHORT_SHA}',
+#       '--delivery-pipeline', 'test-cicd-1-pipeline',
+#       '--region', 'us-central1',
+#       '--to-target', 'multi-prods'
+#     ]
