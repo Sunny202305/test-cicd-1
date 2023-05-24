@@ -28,26 +28,26 @@ steps:
 #     - CLOUDSDK_COMPUTE_ZONE=us-central1
 #     - CLOUDSDK_CONTAINER_CLUSTER=staging
 
-# # Create release in Google Cloud Deploy
-# - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-#   entrypoint: gcloud
-#   args:
-#     [
-#       'deploy', 'releases', 'create', 'rel-${SHORT_SHA}',
-#       '--delivery-pipeline', 'nextjs-cbcd-pipeline',
-#       '--region', 'us-central1',
-#       '--annotations', 'commitId=${REVISION_ID}',
-#       '--images', 'test-cicd-1=us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:${COMMIT_SHA}'
-#     ]
+# Create release in Google Cloud Deploy
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args:
+    [
+      'deploy', 'releases', 'create', 'rel-${SHORT_SHA}',
+      '--delivery-pipeline', 'test-cicd-1-pipeline',
+      '--region', 'us-central1',
+      '--annotations', 'commitId=${REVISION_ID}',
+      '--images', 'test-cicd-1=us-central1-docker.pkg.dev/test-cicd-1/test-cicd-1/test-cicd-1:${COMMIT_SHA}'
+    ]
 
-# # Create release in Google Cloud Deploy(Auto Promote from Staging to Production)
-# - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-#   entrypoint: gcloud
-#   args:
-#     [
-#       'deploy', 'releases', 'promote',
-#       '--release', 'rel-${SHORT_SHA}',
-#       '--delivery-pipeline', 'test-cicd-1-pipeline',
-#       '--region', 'us-central1',
-#       '--to-target', 'multi-prods'
-#     ]
+# Create release in Google Cloud Deploy(Auto Promote from Staging to Production)
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args:
+    [
+      'deploy', 'releases', 'promote',
+      '--release', 'rel-${SHORT_SHA}',
+      '--delivery-pipeline', 'test-cicd-1-pipeline',
+      '--region', 'us-central1',
+      '--to-target', 'multi-prods'
+    ]
